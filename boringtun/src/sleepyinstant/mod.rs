@@ -13,6 +13,10 @@ mod unix;
 #[cfg(unix)]
 use unix as inner;
 
+// Fall back to std; whether suspend time is counted is platform-dependent.
+#[cfg(not(any(unix, target_os = "windows")))]
+use std::time as inner;
+
 /// A measurement of a monotonically nondecreasing clock.
 /// Opaque and useful only with [`Duration`].
 ///
