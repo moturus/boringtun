@@ -301,7 +301,14 @@ impl Tunn {
         self.handle_verified_packet(packet, dst)
     }
 
-    pub(crate) fn handle_verified_packet<'a>(
+    /// Process a packet already verified by this device's shared rate limiter.
+    ///
+    /// Call [`RateLimiter::verify_packet`] before dispatching to a peer. Passing
+    /// its packet here avoids repeating MAC verification and charging the shared
+    /// cookie threshold twice. Session authentication and replay checks still
+    /// run here; a parsed packet alone does not satisfy this precondition.
+    /// Use [`Self::decapsulate`] for datagrams that have not been verified.
+    pub fn handle_verified_packet<'a>(
         &mut self,
         packet: Packet,
         dst: &'a mut [u8],
